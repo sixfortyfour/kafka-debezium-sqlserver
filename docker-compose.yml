@@ -27,10 +27,20 @@
     image: quay.io/debezium/kafka:latest
     ports:
      - 9092:9092
+     - 9093:9093
     links:
      - zookeeper
     environment:
      - ZOOKEEPER_CONNECT=zookeeper:2181
+     - ZOOKEEPER_SASL_ENABLED='false'
+     - KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092, SASL_PLAINTEXT://localhost:9093
+     - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, SASL_PLAINTEXT:SASL_PLAINTEXT
+     - KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SASL_PLAINTEXT
+     - KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAINTEXT
+     - KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+     - KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/configs/kafka_server_jass.conf"
+   volumes:
+     - ./configs:/etc/kafka/configs
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     ports:
